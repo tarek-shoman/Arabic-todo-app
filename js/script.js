@@ -4,7 +4,7 @@ function toArabicNumbers(num) {
     return num.toString().split('').map(digit => arabicNumbers[digit]).join('');
 }
 
-// نظبط الكالندر اهو
+// نظبط الكالندر 
 const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -17,7 +17,7 @@ function createCalendar() {
     const calendar = document.getElementById('calendar');
     calendar.innerHTML = '';
 
-    // نحط الأيام كلها يا باشا
+    // نحط الأيام كلها  
     for (let i = 1; i <= lastDay.getDate(); i++) {
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day';
@@ -31,7 +31,6 @@ function createCalendar() {
         const dayDate = new Date(currentYear, currentMonth, i);
         dayName.textContent = days[dayDate.getDay()].slice(0, 8);
         
-        // نعلم على النهاردة بقى
         if (i === today.getDate() && today.getMonth() === currentMonth) {
             dayElement.classList.add('active');
         }
