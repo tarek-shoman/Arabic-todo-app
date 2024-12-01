@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة المهام اليومية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>قائمة المهام اليومية</h1>
+            </div>
+        </header>
+
+        <div class="welcome-section">
+            <h2 id="userName"></h2>
+        </div>
+
+        <div class="calendar-section">
+            <div class="month-header">
+                <h2 class="day">الأحد</h2>
+                <div class="date">04, أبريل 2024</div>
+            </div>
+            <div class="calendar-grid" id="calendar"></div>
+        </div>
+
+        <div class="task-input">
+            <input type="text" id="taskInput" placeholder="أضف مهمة جديدة...">
+            <button id="addTaskBtn">إضافة</button>
+        </div>
+
+        <div id="taskList" class="task-list"></div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3>المهام المكتملة اليوم</h3>
+                <div class="stat-number" id="completedTasks">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>المهام المعلقة</h3>
+                <div class="stat-number" id="pendingTasks">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>جميع المهام المكتملة</h3>
+                <div class="stat-number" id="allTasksCompleted">0</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>جميع الحقوق محفوظة لدي طارق مصطفي. لعام2024 </p>
+            </footer>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html> 
