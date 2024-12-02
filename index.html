@@ -28,8 +28,27 @@
         </div>
 
         <div class="task-input">
-            <input type="text" id="taskInput" placeholder="أضف مهمة جديدة...">
-            <button id="addTaskBtn">إضافة</button>
+            <div class="task-form">
+                <textarea id="taskInput" placeholder="أضف مهمة جديدة..." rows="3"></textarea>
+                <div class="task-details">
+                    <div class="time-inputs">
+                        <input type="datetime-local" id="taskStartTime" class="time-input">
+                        <span>موعد البدء</span>
+                        <input type="datetime-local" id="taskEndTime" class="time-input">
+                        <span>موعد الانتهاء</span>
+                    </div>
+                    <div class="priority-select">
+                        <select id="taskPriority">
+                            <option value="important-urgent">مهم وضروري</option>
+                            <option value="important-not-urgent">مهم وغير ضروري</option>
+                            <option value="not-important-urgent">عادي وضروري</option>
+                            <option value="not-important-not-urgent">عادي غير ضروري</option>
+                        </select>
+                        <span>الأولوية</span>
+                    </div>
+                </div>
+                <button id="addTaskBtn">إضافة</button>
+            </div>
         </div>
 
         <div id="taskList" class="task-list"></div>
