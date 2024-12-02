@@ -61,8 +61,5 @@ https://tarekmostafa123.github.io/arabic-todo-app/
 4. قم بدفع الفرع (`git push origin feature/amazing-feature`)
 5. قم بفتح طلب Pull Request
 
-## الترخيص
-هذا المشروع مرخص تحت رخصة MIT - انظر ملف [LICENSE](LICENSE) للتفاصيل.
-
 ## المطور
 طارق مصطفى - [GitHub](https://github.com/TarekMostafa123)
