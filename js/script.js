@@ -129,23 +129,106 @@ function updateDate() {
 
 // شغل التاسكات يا برنس
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let displayedTasks = 5; // عدد المهام المعروضة في البداية
+
+// Priority labels in Arabic
+const priorityLabels = {
+    'important-urgent': 'مهم وضروري',
+    'important-not-urgent': 'مهم وغير ضروري',
+    'not-important-urgent': 'عادي وضروري',
+    'not-important-not-urgent': 'عادي غير ضروري'
+};
 
 function addTask() {
     const taskInput = document.getElementById('taskInput');
-    const taskText = taskInput.value.trim();
+    const taskStartTime = document.getElementById('taskStartTime');
+    const taskEndTime = document.getElementById('taskEndTime');
+    const taskPriority = document.getElementById('taskPriority');
     
-    if (taskText) {
-        const task = {
-            id: Date.now(),
-            text: taskText,
-            completed: false,
-            date: new Date().toISOString()
-        };
+    if (taskInput.value.trim() === '') return;
+    
+    const task = {
+        id: Date.now(),
+        text: taskInput.value.trim(),
+        completed: false,
+        startTime: taskStartTime.value,
+        endTime: taskEndTime.value,
+        priority: taskPriority.value,
+        createdAt: new Date().toISOString(),
+        completedAt: null,
+        deleted: false
+    };
+    
+    tasks.push(task);
+    saveTasks();
+    renderTasks();
+    setupNotifications(task);
+    
+    taskInput.value = '';
+    taskStartTime.value = '';
+    taskEndTime.value = '';
+}
+
+// دالة تشغيل صوت التنبيه
+function playNotificationSound() {
+    const audio = new Audio('sounds/notification.mp3');
+    
+    // محاولة تشغيل الصوت مع صوت احتياطي
+    audio.play().catch(error => {
+        console.log('Trying fallback sound...');
+        const fallbackAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        fallbackAudio.play().catch(err => {
+            console.log('Failed to play notification sound:', err);
+        });
+    });
+}
+
+// دالة عرض الإشعار مع الصوت
+function showNotification(message) {
+    playNotificationSound();
+    
+    // إذا كان المتصفح يدعم الإشعارات
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+            new Notification("تنبيه المهام", { body: message });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification("تنبيه المهام", { body: message });
+                }
+            });
+        }
+    }
+    
+    // عرض التنبيه التقليدي كاحتياطي
+    alert(message);
+}
+
+function setupNotifications(task) {
+    if (task.startTime) {
+        const startTime = new Date(task.startTime).getTime();
+        const notifyTime = startTime - (5 * 60 * 1000); // 5 minutes before
         
-        tasks.push(task);
-        saveTasks();
-        renderTasks();
-        taskInput.value = '';
+        if (notifyTime > Date.now()) {
+            setTimeout(() => {
+                if (!task.completed && !task.deleted) {
+                    showNotification(`المهمة "${task.text}" ستبدأ خلال 5 دقائق`);
+                }
+            }, notifyTime - Date.now());
+        }
+    }
+    
+    if (task.endTime) {
+        const endTime = new Date(task.endTime).getTime();
+        const notifyTime = endTime - (5 * 60 * 1000); // 5 minutes before
+        
+        if (notifyTime > Date.now()) {
+            setTimeout(() => {
+                if (!task.completed && !task.deleted) {
+                    showNotification(`المهمة "${task.text}" ستنتهي خلال 5 دقائق`);
+                }
+            }, notifyTime - Date.now());
+        }
     }
 }
 
@@ -153,15 +236,108 @@ function toggleTask(id) {
     const task = tasks.find(t => t.id === id);
     if (task) {
         task.completed = !task.completed;
+        task.completedAt = task.completed ? new Date().toISOString() : null;
         saveTasks();
         renderTasks();
     }
 }
 
 function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
+    const taskIndex = tasks.findIndex(task => task.id === id);
+    if (taskIndex !== -1) {
+        tasks[taskIndex].deleted = true;
+        saveTasks();
+        renderTasks();
+    }
+}
+
+function cleanupCompletedTasks() {
+    const now = new Date().getTime();
+    tasks = tasks.filter(task => {
+        if (task.completed && task.completedAt) {
+            const completedTime = new Date(task.completedAt).getTime();
+            return now - completedTime < 24 * 60 * 60 * 1000; // 24 hours
+        }
+        return true;
+    });
     saveTasks();
-    renderTasks();
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString('ar-EG')} ${date.toLocaleTimeString('ar-EG')}`;
+}
+
+function renderTasks() {
+    cleanupCompletedTasks();
+    const taskList = document.getElementById('taskList');
+    taskList.innerHTML = '';
+    
+    // Filter active tasks (not deleted)
+    const activeTasks = tasks.filter(task => !task.deleted);
+    const visibleTasks = activeTasks.slice(0, displayedTasks);
+    
+    visibleTasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.className = `task-item ${task.priority}`;
+        if (task.completed) taskElement.classList.add('completed');
+        
+        const taskContent = document.createElement('div');
+        taskContent.className = 'task-content';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.addEventListener('change', () => toggleTask(task.id));
+        
+        const taskText = document.createElement('span');
+        taskText.textContent = task.text;
+        
+        const taskMeta = document.createElement('div');
+        taskMeta.className = 'task-meta';
+        
+        const priorityLabel = document.createElement('span');
+        priorityLabel.className = 'priority-label';
+        priorityLabel.textContent = priorityLabels[task.priority];
+        
+        const taskTimes = document.createElement('div');
+        taskTimes.className = 'task-times';
+        if (task.startTime) {
+            taskTimes.innerHTML += `<span>البدء: ${formatDateTime(task.startTime)}</span>`;
+        }
+        if (task.endTime) {
+            taskTimes.innerHTML += `<span>الانتهاء: ${formatDateTime(task.endTime)}</span>`;
+        }
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.addEventListener('click', () => deleteTask(task.id));
+        
+        taskContent.appendChild(checkbox);
+        taskContent.appendChild(taskText);
+        taskMeta.appendChild(priorityLabel);
+        taskMeta.appendChild(taskTimes);
+        taskContent.appendChild(taskMeta);
+        taskElement.appendChild(taskContent);
+        taskElement.appendChild(deleteBtn);
+        taskList.appendChild(taskElement);
+    });
+    
+    // Add load more button if there are more tasks
+    if (activeTasks.length > displayedTasks) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'load-more-btn';
+        loadMoreBtn.textContent = 'عرض المزيد';
+        loadMoreBtn.addEventListener('click', () => {
+            displayedTasks += 5;
+            renderTasks();
+        });
+        taskList.appendChild(loadMoreBtn);
+    }
+    
+    updateStats();
 }
 
 function saveTasks() {
@@ -169,49 +345,15 @@ function saveTasks() {
     updateStats();
 }
 
-function renderTasks() {
-    const taskList = document.getElementById('taskList');
-    taskList.innerHTML = '';
-    
-    tasks.forEach(task => {
-        const taskElement = document.createElement('div');
-        taskElement.className = 'task-item';
-        
-        const taskContent = document.createElement('div');
-        taskContent.className = 'task-content';
-        taskContent.textContent = task.text;
-        if (task.completed) {
-            taskContent.style.textDecoration = 'line-through';
-        }
-        
-        const taskActions = document.createElement('div');
-        taskActions.className = 'task-actions';
-        
-        const toggleBtn = document.createElement('button');
-        toggleBtn.textContent = task.completed ? 'تراجع' : 'تم';
-        toggleBtn.onclick = () => toggleTask(task.id);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'حذف';
-        deleteBtn.onclick = () => deleteTask(task.id);
-        
-        taskActions.appendChild(toggleBtn);
-        taskActions.appendChild(deleteBtn);
-        
-        taskElement.appendChild(taskContent);
-        taskElement.appendChild(taskActions);
-        
-        taskList.appendChild(taskElement);
-    });
-}
-
 function updateStats() {
-    const completedTasks = tasks.filter(t => t.completed).length;
-    const pendingTasks = tasks.length - completedTasks;
-    
+    const totalTasks = tasks.filter(task => !task.deleted).length;
+    const completedTasks = tasks.filter(task => task.completed && !task.deleted).length;
+    const pendingTasks = totalTasks - completedTasks;
+    const allTimeCompleted = tasks.filter(task => task.completed && !task.deleted).length;
+
     document.getElementById('completedTasks').textContent = toArabicNumbers(completedTasks);
     document.getElementById('pendingTasks').textContent = toArabicNumbers(pendingTasks);
-    document.getElementById('allTasksCompleted').textContent = toArabicNumbers(completedTasks);
+    document.getElementById('allTasksCompleted').textContent = toArabicNumbers(allTimeCompleted);
 }
 
 // خلي بالك من الإيفنتات دي يا معلم
