@@ -35,7 +35,6 @@ header {
     color: var(--secondary-color);
 }
 
-/* الترحيب اهو يا معلم */
 .welcome-section {
     margin-bottom: 30px;
     text-align: center;
@@ -139,7 +138,6 @@ header {
         color: rgba(255, 255, 255, 0.8);
     }
 
-/* مكان كتابة التاسك يا برنس */
 .task-input {
     margin-bottom: 20px;
     margin-top: 20px;
@@ -197,7 +195,6 @@ header {
     font-family: 'Cairo', sans-serif;
 }
 
-/* Priority Colors */
 .task-item.important-urgent {
     border-right: 4px solid #ff4444;
 }
@@ -231,7 +228,6 @@ header {
     gap: 10px;
 }
 
-/* ليستة التاسكات يا كبير */
 .task-list {
     margin-bottom: 20px;
 }
@@ -251,7 +247,6 @@ header {
     flex: 1;
 }
 
-/* تصميم الأزرار */
 #addTaskBtn {
     padding: 12px 25px;
     background-color: var(--primary-color);
@@ -342,7 +337,6 @@ header {
     color: #666;
 }
 
-/* الإحصائيات بتاعتنا يا باشا */
 .stats-section {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -394,7 +388,6 @@ header {
     }
 }
 
-/* الفوتر بتاعنا يا معلم */
 footer {
     text-align: center;
     margin-top: 50px;
