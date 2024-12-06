@@ -29,7 +29,7 @@
 
 ## رابط التطبيق
 يمكنك تجربة التطبيق مباشرة من خلال الرابط التالي:
-https://tarek-shoman.github.io/arabic-todo-app/
+https://tarek-shoman.github.io/Arabic-todo-app/
 
 ## التقنيات المستخدمة
 - HTML5
